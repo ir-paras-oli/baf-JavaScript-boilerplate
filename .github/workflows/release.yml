@@ -37,7 +37,7 @@ jobs:
       - name: AWS S3 upload
         run: |
           echo "Mocking AWS S3 upload to s3://$AWS_S3_BUCKET/"
-          echo "Files uploaded: build/static/js/2.c7a5050c.chunk.js" # Add mock file names
+          echo "Files uploaded: build/static/js/2.c7a5050c.chunk.js" 
           echo "Files uploaded: build/static/js/runtime-main.884e40fd.js.map"
       - name: CloudFront invalidation
         run: |
