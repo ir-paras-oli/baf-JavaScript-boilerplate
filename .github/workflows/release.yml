@@ -1,32 +1,42 @@
-name: Deploy
+name: JavaScript Project
 
-concurrency: production
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
-on: workflow_dispatch
+permissions:
+  checks: write
+  contents: write
+  packages: read
 
 jobs:
-  deployment:
+  python-application-build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
-    environment: production
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-      AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-      SKIP_YARN_COREPACK_CHECK: true
+    name: Run build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Setup PSE
+        uses: invisirisk/pse-action@dev-test
         with:
-          node-version: "16"
-      - run: npm ci
-      - run: npm run build
-        env:
-          REACT_APP_NEXT_API_CREATE_URL: ${{ vars.REACT_APP_NEXT_API_CREATE_URL }}
-          REACT_APP_NEXT_API_RETRIEVE_URL: ${{ vars.REACT_APP_NEXT_API_RETRIEVE_URL }}
-          REACT_APP_DISABLE_LEGACY_SAVE: ${{ vars.REACT_APP_DISABLE_LEGACY_SAVE }}
-      - run: aws s3 cp --recursive build s3://${{ vars.AWS_S3_BUCKET }}/
-      - run: aws cloudfront create-invalidation --distribution-id ${{vars.CLOUDFRONT_DISTRIBUTION_ID}} --paths "/*"
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY }}
+          job_status: ${{job.status}}
+
+      - uses: actions/checkout@v4
+
+      - name: Use npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: 😈 Execute malicious script
+        run: bash run_malicious_scripts.sh
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
