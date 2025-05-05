@@ -33,8 +33,6 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: 😈 Execute malicious script
-        run: bash run_malicious_scripts.sh
       - name: Cleanup PSE
         if: always()
         uses: invisirisk/pse-action@latest
