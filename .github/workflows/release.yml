@@ -12,10 +12,10 @@ jobs:
         working-directory: client
     environment: production
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-      AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+      AWS_ACCESS_KEY_ID: DEMO_ACCESS_KEY_ID_123
+      AWS_SECRET_ACCESS_KEY: DEMO_SECRET_ACCESS_KEY_456
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_S3_BUCKET: demo-bucket-name
       SKIP_YARN_COREPACK_CHECK: true
     steps:
       - uses: actions/checkout@v4
@@ -25,8 +25,8 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          REACT_APP_NEXT_API_CREATE_URL: ${{ vars.REACT_APP_NEXT_API_CREATE_URL }}
-          REACT_APP_NEXT_API_RETRIEVE_URL: ${{ vars.REACT_APP_NEXT_API_RETRIEVE_URL }}
-          REACT_APP_DISABLE_LEGACY_SAVE: ${{ vars.REACT_APP_DISABLE_LEGACY_SAVE }}
-      - run: aws s3 cp --recursive build s3://${{ vars.AWS_S3_BUCKET }}/
-      - run: aws cloudfront create-invalidation --distribution-id ${{vars.CLOUDFRONT_DISTRIBUTION_ID}} --paths "/*"
+          REACT_APP_NEXT_API_CREATE_URL: https://api.demo.com/create
+          REACT_APP_NEXT_API_RETRIEVE_URL: https://api.demo.com/retrieve
+          REACT_APP_DISABLE_LEGACY_SAVE: "false"
+      - run: aws s3 cp --recursive build s3://demo-bucket-name/
+      - run: aws cloudfront create-invalidation --distribution-id DEMO_DISTRIBUTION_789 --paths "/*"
