@@ -1,63 +1,46 @@
-name: Deploy
+name: JavaScript Project
+
+
 
 concurrency: production
 
+
+
 on: workflow_dispatch
+
+
 
 jobs:
   deployment:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
-    environment: production
-    env:
-      AWS_ACCESS_KEY_ID: DEMO_ACCESS_KEY_ID_123
-      AWS_SECRET_ACCESS_KEY: DEMO_SECRET_ACCESS_KEY_456
-      AWS_DEFAULT_REGION: us-east-1
-      AWS_S3_BUCKET: demo-bucket-name
-      SKIP_YARN_COREPACK_CHECK: true
-    steps:
-      - uses: actions/checkout@v4
-
-      # InvisiRisk Setup Step
-      - name: Setup PSE (InvisiRisk Build Application Firewall)
-        uses: invisirisk/pse-action@v1.0.20
-        with:
-          api_url: "https://app.stage.invisirisk.com"
-          app_token: ${{ secrets.IR_API_KEY }}
-
-      # Set up Node.js
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "16"
-
-      # Install dependencies
-      - run: npm ci
-
-      # Run the build command
-      - run: npm run build
-        env:
-          REACT_APP_NEXT_API_CREATE_URL: https://api.demo.com/create
-          REACT_APP_NEXT_API_RETRIEVE_URL: https://api.demo.com/retrieve
-          REACT_APP_DISABLE_LEGACY_SAVE: "false"
-
-      # Mock AWS S3 upload
-      - name: Mock AWS S3 upload
-        run: |
-          echo "Mocking AWS S3 upload to s3://$AWS_S3_BUCKET/"
-          echo "Files uploaded: build/static/js/2.c7a5050c.chunk.js" # Add mock file names
-          echo "Files uploaded: build/static/js/runtime-main.884e40fd.js.map"
-
-      # Mock CloudFront invalidation
-      - name: Mock CloudFront invalidation
-        run: |
-          echo "Mocking CloudFront invalidation for distribution-id DEMO_DISTRIBUTION_789"
-          echo "Invalidating paths: /*"
-
-      # InvisiRisk Cleanup Step
-      - name: Cleanup PSE (InvisiRisk Build Application Firewall)
-        if: always()
-        uses: invisirisk/pse-action@v1.0.20
-        with:
-          cleanup: "true"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    environment: production
+    env:
+      AWS_ACCESS_KEY_ID: DEMO_ACCESS_KEY_ID_123
+      AWS_SECRET_ACCESS_KEY: DEMO_SECRET_ACCESS_KEY_456
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_S3_BUCKET: demo-bucket-name
+      SKIP_YARN_COREPACK_CHECK: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+      - run: npm ci
+      - run: npm run build
+        env:
+          REACT_APP_NEXT_API_CREATE_URL: https://api.demo.com/create
+          REACT_APP_NEXT_API_RETRIEVE_URL: https://api.demo.com/retrieve
+          REACT_APP_DISABLE_LEGACY_SAVE: "false"
+      - name: Mock AWS S3 upload
+        run: |
+          echo "Mocking AWS S3 upload to s3://$AWS_S3_BUCKET/"
+          echo "Files uploaded: build/static/js/2.c7a5050c.chunk.js" # Add mock file names
+          echo "Files uploaded: build/static/js/runtime-main.884e40fd.js.map"
+      - name: Mock CloudFront invalidation
+        run: |
+          echo "Mocking CloudFront invalidation for distribution-id DEMO_DISTRIBUTION_789"
+          echo "Invalidating paths: /*"
+ 
