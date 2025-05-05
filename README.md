@@ -1,63 +1,55 @@
-# Math3d-React [![Build Status](https://travis-ci.com/ChristopherChudzicki/math3d-react.svg?branch=master)](https://travis-ci.com/ChristopherChudzicki/math3d-react)
+# InvisiRisk Build Application Firewall Demo
 
-Live at [math3d.org](https://www.math3d.org)
+This repository contains a JavaScript application that demonstrates how InvisiRisk build application firewall works. The project serves as a boilerplate example to showcase the security features and implementation of InvisiRisk in a JavaScript environment.
 
-## Package Anatomy
+## GitHub Workflow Setup
 
-This repository has three `package.json` files:
+To integrate InvisiRisk into your GitHub workflow, add the following steps to each job in your workflow file:
 
-- `math3d-react/server/package.json` server dependencies and scripts
-- `math3d-react/client/package.json` client dependencies and scripts
-- `math3d-react/package.json` deployment & development scripts
+### 1. Add the Setup PSE step at the beginning of each job:
 
+```yaml
+- name: Setup PSE
+  uses: invisirisk/pse-action@v1.0.20
+  with:
+    api_url: "https://app.invisirisk.com"
+    app_token: ${{ secrets.IR_API_KEY }}
+```
 
-## To Install for Local Development:
+### 2. Add the Cleanup PSE step at the end of each job:
 
-1. **Install Postgresql:** If it is not already installed, you'll need to install `postgres` as our database. On a Mac, we recommend installing `postgres` with Homebrew:
+```yaml
+- name: Cleanup PSE
+  if: always()
+  uses: invisirisk/pse-action@v1.0.20
+  with:
+    cleanup: "true"
+```
 
-    ```bash
-    > brew update
-    > brew install postgresql
-    ```
+### 3. Set up the required secret:
 
-1. **Bootstrapping the database:** Create a database cluster and start Postgres 
+You need to set the IR_API_KEY secret in your GitHub repository settings. This API key can be obtained from the InvisiRisk portal.
 
-    ```bash
-    # creates a new database cluster
-    > initdb /usr/local/var/postgres
-    # starts postgres
-    > pg_ctl -D /usr/local/var/postgres start
-    # create user math3d_user and database math3d
-    > psql -d postgres -f server/migrations/create_database.sql
-    # create schema
-    > psql -U math3d_user -d math3d -f server/migrations/database_setup.sql
-    ```
+### Example workflow:
 
-1. **Set Database Connection:** Create a `.env` file in the `server/` directory to set `DATABASE_URL` database connection environment variable. For local development, just copy the template:
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-    ```bash
-    > cp server/dotenv_template server/.env
-    ```
+      - name: Setup PSE
+        uses: invisirisk/pse-action@v1.0.20
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY }}
 
-1. **Install Dependencies:** Clone the git repo and `cd` to package root, then run:
+      # Your other build steps here
 
-    ```bash
-    > npm install
-    ```
-
-    which installs both client and server dependencies.
-
-
-1. **Start Server & Client:** In a new terminal window, start the server:
-
-    ```bash
-    > npm run start:dev:server
-    ```
-
-    and, in a third terminal window, start the client app:
-
-    ```bash
-    > npm run start:dev:client
-    ```
-
-The math3d-react app is now being served on `http://localhost:3000/`.
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@v1.0.20
+        with:
+          cleanup: "true"
+```
