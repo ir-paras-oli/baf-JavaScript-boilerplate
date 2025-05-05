@@ -24,7 +24,7 @@ jobs:
       - name: Setup PSE (InvisiRisk Build Application Firewall)
         uses: invisirisk/pse-action@v1.0.20
         with:
-          api_url: "https://app.invisirisk.com"
+          api_url: "https://app.stage.invisirisk.com"
           app_token: ${{ secrets.IR_API_KEY }}
 
       # Set up Node.js
